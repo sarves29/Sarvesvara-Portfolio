@@ -38,7 +38,7 @@ them to the site automatically.
 | Email | SendGrid |
 | Frontend | Django templates, HTML5, CSS3, JavaScript |
 | Serving | Gunicorn, WhiteNoise |
-| Database | SQLite (swap in PostgreSQL for production) |
+| Database | PostgreSQL in production (`DATABASE_URL`), SQLite locally |
 | Hosting | Railway |
 
 ## Project structure
@@ -87,17 +87,27 @@ All configuration comes from environment variables. See [`.env.example`](.env.ex
 | `SENDGRID_API_KEY`, `CONTACT_FROM_EMAIL`, `CONTACT_TO_EMAIL` | Contact form email |
 | `CONTACT_RATE_LIMIT` | Contact messages allowed per IP per hour (default 5) |
 | `GOOGLE_API_KEY` | Gemini, for resume parsing |
+| `DATABASE_URL` | Postgres connection string; falls back to local SQLite |
+| `MEDIA_ROOT` | Where uploads are stored; point it at a persistent volume |
 | `DJANGO_SUPERUSER_*` | Used by `create_superuser.py`; there is no default password |
 
-## Deploying (Railway / Render)
+## Deploying on Railway
 
-- **Build:** `pip install -r requirements.txt && python manage.py collectstatic --noinput`
-- **Release:** `python manage.py migrate --noinput && python create_superuser.py`
-- **Start:** `gunicorn portfolio_site.wsgi:application`
+`railway.json` defines the build and start commands. The start command runs
+migrations, creates the admin user if one is missing, and starts Gunicorn.
 
-Set the environment variables above in the platform dashboard. With `DEBUG`
-off, the app turns on the HTTPS redirect, secure cookies, HSTS, `nosniff` and
-clickjacking protection.
+1. **New Project → Deploy from GitHub repo** → pick this repo.
+2. **Add a PostgreSQL database** to the project. Railway's container disk is
+   wiped on every deploy, so SQLite would lose your projects and admin account.
+3. **Add a Volume** to the web service, mounted at `/app/media`, so uploaded
+   resumes and project images survive redeploys.
+4. Set the **variables** from [`.env.example`](.env.example), including
+   `DATABASE_URL=${{Postgres.DATABASE_URL}}` and `MEDIA_ROOT=/app/media`.
+5. **Settings → Networking → Generate Domain**, then put that domain in
+   `DJANGO_ALLOWED_HOSTS` and `https://<domain>` in `DJANGO_CSRF_TRUSTED_ORIGINS`.
+
+With `DEBUG` off, the app turns on the HTTPS redirect, secure cookies, HSTS,
+`nosniff` and clickjacking protection.
 
 ## Security
 

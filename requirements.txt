@@ -8,4 +8,5 @@ sendgrid
 pdfminer.six
 google-genai
 PyPDF2 
-python-docx
+python-docxdj-database-url
+psycopg[binary]

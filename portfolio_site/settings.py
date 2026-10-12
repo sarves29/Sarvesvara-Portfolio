@@ -3,6 +3,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 import logging
 
+import dj_database_url
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
@@ -88,11 +90,12 @@ LOGGING = {
 
 WSGI_APPLICATION = 'portfolio_site.wsgi.application'
 
+# Railway/Render inject DATABASE_URL when a Postgres service is attached; SQLite
+# is only for local work (a container's disk is wiped on every deploy).
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}", conn_max_age=600
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -111,7 +114,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'site_portfolio' / 'static']
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Point at a mounted volume in production so uploads survive redeploys.
+MEDIA_ROOT = Path(os.getenv('MEDIA_ROOT', BASE_DIR / 'media'))
 
 # SendGrid setup
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # optional fallback for local testing

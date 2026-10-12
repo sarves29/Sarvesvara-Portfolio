@@ -11,11 +11,11 @@ username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
 email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "admin@example.com")
 password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
 
-if not password:
-    raise SystemExit("Set DJANGO_SUPERUSER_PASSWORD — there is deliberately no default.")
-
-if not User.objects.filter(username=username).exists():
+if User.objects.filter(username=username).exists():
+    print("⚠️ Superuser already exists — skipping.")
+elif not password:
+    # Not fatal: this runs on every deploy, and the site must still start.
+    print("⚠️ DJANGO_SUPERUSER_PASSWORD not set — no admin created (there is deliberately no default).")
+else:
     User.objects.create_superuser(username=username, email=email, password=password)
     print("✅ Superuser created successfully.")
-else:
-    print("⚠️ Superuser already exists — skipping.")
