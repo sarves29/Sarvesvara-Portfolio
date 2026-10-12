@@ -5,6 +5,7 @@ from docx import Document
 from google import genai
 import os
 import json
+import time
 from dotenv import load_dotenv
 from django.utils.text import slugify
 # ✅ Load environment variables early
@@ -54,6 +55,29 @@ def extract_text_from_file(file_path):
     else:
         raise ValueError("Unsupported file format")
 
+
+GEMINI_MODELS = ("gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-pro")
+
+
+def _generate_with_retry(prompt, max_attempts=4):
+    """Call Gemini with exponential backoff; rotate through fallback models on 503."""
+    last_err = None
+    for model in GEMINI_MODELS:
+        for attempt in range(max_attempts):
+            try:
+                return client.models.generate_content(model=model, contents=prompt)
+            except Exception as e:
+                msg = str(e)
+                last_err = e
+                transient = "503" in msg or "UNAVAILABLE" in msg or "overloaded" in msg.lower()
+                if not transient:
+                    raise
+                if attempt < max_attempts - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+                break
+    raise last_err
+
 @admin.register(Resume)
 class ResumeAdmin(admin.ModelAdmin):
     list_display = ("title", "processed", "uploaded_at")
@@ -99,10 +123,7 @@ class ResumeAdmin(admin.ModelAdmin):
             {resume_text}
             """
 
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
+            response = _generate_with_retry(prompt)
 
             # 3️⃣ Debug
             print("🧠 Gemini raw output:\n", response.text)
@@ -148,4 +169,11 @@ class ResumeAdmin(admin.ModelAdmin):
             )
 
         except Exception as e:
-            messages.error(request, f"❌ Error processing resume: {e}")
+            msg = str(e)
+            if "503" in msg or "UNAVAILABLE" in msg or "overloaded" in msg.lower():
+                messages.error(
+                    request,
+                    "❌ Gemini is temporarily overloaded (503). Resume saved — click Save again in a minute to retry processing.",
+                )
+            else:
+                messages.error(request, f"❌ Error processing resume: {e}")

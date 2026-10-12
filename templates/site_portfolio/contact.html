@@ -1,62 +1,70 @@
 {% extends 'site_portfolio/base.html' %}
-{% block content %}
 {% load static %}
 
-{% for message in messages %}
-  <div class="max-w-3xl mx-auto mt-6 px-4">
-    <div class="p-4 mb-4 text-sm text-green-800 bg-green-200 rounded-lg" role="alert">
-      {{ message }}
-    </div>
-  </div>
-{% endfor %}
+{% block title %}Contact — {{ SITE_NAME }}{% endblock %}
+{% block description %}Start a conversation with Sarvesvara Ramar. Open to full-time roles, contract work, and thoughtful collaborations.{% endblock %}
 
-<section class="relative mx-auto px-4 py-20 min-h-screen flex justify-center items-center">
-  <!-- Glass Container -->
-  <div class="relative glass rounded-2xl p-8 md:p-12 max-w-3xl w-full shadow-lg overflow-hidden">
-    <!-- Content Layer -->
-    <div class="relative z-10">
-      <h2 class="text-3xl sm:text-4xl font-bold mb-6 text-center text-cyan-400">Get in Touch</h2>
-      <p class="text-gray-300 text-center mb-8 max-w-md mx-auto text-sm sm:text-base">
-        Have a question, collaboration idea, or project in mind?  
-        Drop a message and I’ll get back to you soon.
+{% block content %}
+
+<section class="relative pt-32 md:pt-40 pb-24">
+  <div class="mx-auto max-w-[1400px] px-6 md:px-10 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16">
+
+    <div class="md:col-span-6" data-reveal="up">
+      <p class="section-label mb-4">Say hi</p>
+      <h1 class="font-display font-medium leading-tight text-balance tracking-tight" data-split="words" style="font-size: clamp(1.75rem, 3.5vw, 3rem)">
+        Let's make <span class="text-flame">it real.</span>
+      </h1>
+      <p class="mt-8 text-lg text-paper/80 max-w-md text-pretty">
+        Reach out for full-time roles, contract engagements, or honest technical conversations. I reply within a day.
       </p>
 
-      <!-- Contact Form -->
-      <form method="POST" class="space-y-6">
-        {% csrf_token %}
-        <div>
-          <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Your Name</label>
-          <input type="text" id="name" name="name" required
-                 class="w-full px-4 py-2 rounded-md bg-gray-900/60 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-200 placeholder-gray-400">
-        </div>
+      <div class="mt-10 space-y-3">
+        <a href="mailto:sarvesvarasar@gmail.com" class="link-arrow text-sm">sarvesvarasar@gmail.com</a><br>
+        <a href="tel:+919597519919" class="link-arrow text-sm">+91 95975 19919</a><br>
+        <a href="https://linkedin.com/in/sarvesvara-ramar" rel="noopener" class="link-arrow text-sm">LinkedIn</a>
+      </div>
 
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Your Email</label>
-          <input type="email" id="email" name="email" required
-                 class="w-full px-4 py-2 rounded-md bg-gray-900/60 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-200 placeholder-gray-400">
-        </div>
-
-        <div>
-          <label for="message" class="block text-sm font-medium text-gray-300 mb-1">Message</label>
-          <textarea id="message" name="message" rows="5" required
-                    class="w-full px-4 py-2 rounded-md bg-gray-900/60 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-200 placeholder-gray-400"></textarea>
-        </div>
-
-        <div class="text-center">
-          <button type="submit"
-                  class="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-6 py-2 rounded-md transition">
-            Send Message
-          </button>
-        </div>
-      </form>
-
-      <!-- Contact Info -->
-      <div class="mt-10 text-center">
-        <p class="text-gray-400 text-sm">Or reach me directly:</p>
-        <p class="text-gray-200 font-medium mt-1">📧 sarvesvarasar@gmail.com</p>
-        <p class="text-gray-200 font-medium">📱 +91 95975 19919</p>
+      <div class="mt-12 pt-8 border-t border-paper/15">
+        <p class="section-label mb-2">Based in</p>
+        <p class="text-paper/80">Chennai, India · UTC+5:30 · Open to remote & relocation</p>
       </div>
     </div>
+
+    <div class="md:col-span-6 md:col-start-7">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="mb-6 p-4 rounded-2xl border {% if message.tags == 'error' %}border-flame/40 bg-flame/5 text-flame-dark{% else %}border-paper/15 bg-ink-soft text-paper{% endif %}" data-reveal="fade">
+            <p class="text-sm">{{ message }}</p>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" class="card-bento p-8 md:p-10 space-y-6" data-reveal="up">
+        {% csrf_token %}
+
+        <div>
+          <label for="name" class="section-label block mb-2">Your name</label>
+          <input id="name" name="name" type="text" required class="w-full bg-transparent border-b border-paper/20 py-3 focus:outline-none focus:border-flame text-lg placeholder:text-paper/30" placeholder="Jane Doe">
+        </div>
+
+        <div>
+          <label for="email" class="section-label block mb-2">Your email</label>
+          <input id="email" name="email" type="email" required class="w-full bg-transparent border-b border-paper/20 py-3 focus:outline-none focus:border-flame text-lg placeholder:text-paper/30" placeholder="jane@company.com">
+        </div>
+
+        <div>
+          <label for="message" class="section-label block mb-2">The gist</label>
+          <textarea id="message" name="message" rows="5" required class="w-full bg-transparent border-b border-paper/20 py-3 focus:outline-none focus:border-flame text-lg placeholder:text-paper/30 resize-none" placeholder="What are you working on?"></textarea>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <span class="font-mono text-[11px] uppercase tracking-[0.25em] text-paper/40">Replies within 24h</span>
+          <button type="submit" class="btn-primary" data-magnetic="0.3">Send message →</button>
+        </div>
+      </form>
+    </div>
+
   </div>
 </section>
+
 {% endblock %}

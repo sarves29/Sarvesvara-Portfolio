@@ -1,0 +1,75 @@
+{% extends 'site_portfolio/base.html' %}
+{% load static %}
+
+{% block title %}Now — {{ SITE_NAME }}{% endblock %}
+{% block description %}What Sarvesvara is working on right now.{% endblock %}
+
+{% block content %}
+
+<section class="relative pt-32 md:pt-40 pb-24">
+  <div class="mx-auto max-w-[1000px] px-6 md:px-10">
+    <p class="section-label mb-4" data-reveal="up">/now</p>
+    <h1 class="font-display font-medium leading-tight text-balance tracking-tight" data-split="words" style="font-size: clamp(1.75rem, 3vw, 2.75rem)">
+      What I'm <span class="text-flame">working on now.</span>
+    </h1>
+
+    <p class="mt-10 text-xl text-paper/75 text-pretty max-w-2xl" data-reveal="up" data-reveal-delay="0.1">
+      A snapshot, updated when things change. Inspired by <a href="https://nownownow.com" rel="noopener" class="link-arrow">nownownow.com</a>.
+    </p>
+
+    <div class="mt-16 space-y-10" data-reveal-stagger>
+
+      <article class="border-t border-paper/15 pt-8">
+        <p class="section-label mb-4">At work</p>
+        <p class="text-lg text-paper/85 text-pretty">
+          At <strong>NEWPRODATA</strong>, owning two parallel systems — the Datasprings data platform and the AI workflow engine. Current focus: pushing the RAG layer further into reliability and bringing down retrieval latency.
+        </p>
+      </article>
+
+      <article class="border-t border-paper/15 pt-8">
+        <p class="section-label mb-4">Side builds</p>
+        <p class="text-lg text-paper/85 text-pretty">
+          This portfolio. Hand-built in Django + Tailwind + GSAP + Three.js, hosted alongside two other projects on my own Linux box.
+        </p>
+      </article>
+
+      <article class="border-t border-paper/15 pt-8">
+        <p class="section-label mb-4">Reading / watching</p>
+        <p class="text-lg text-paper/85 text-pretty">
+          Anything on system design under constraint — real-world post-mortems, SRE writing, and the occasional deep-dive into how distributed databases actually work.
+        </p>
+      </article>
+
+      <article class="border-t border-paper/15 pt-8">
+        <p class="section-label mb-4">Open to</p>
+        <p class="text-lg text-paper/85 text-pretty">
+          Full-time backend / product engineer roles. Contract work on Django or AI-integration projects. Quick conversations about systems you're stuck on.
+        </p>
+      </article>
+
+      {% if github_events %}
+      <article class="border-t border-paper/15 pt-8">
+        <div class="flex items-baseline justify-between gap-3 mb-4">
+          <p class="section-label">Public commits</p>
+          <a href="https://github.com/{{ github_username }}" rel="noopener" class="font-mono text-[10px] uppercase tracking-[0.25em] text-paper/40 hover:text-flame transition-colors">github.com/{{ github_username }} →</a>
+        </div>
+        <ul class="font-mono text-xs text-paper/75 space-y-2">
+          {% for ev in github_events %}
+          <li class="flex flex-wrap items-baseline gap-x-2">
+            <span class="text-flame">◆</span>
+            <span class="text-paper/50">{{ ev.created_at|slice:":10" }}</span>
+            <span>{{ ev.label }}</span>
+            <a href="{{ ev.repo_url }}" rel="noopener" class="underline decoration-paper/20 hover:decoration-flame hover:text-paper">{{ ev.repo }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </article>
+      {% endif %}
+
+    </div>
+
+    <p class="mt-20 font-mono text-[11px] uppercase tracking-[0.25em] text-paper/40">Last updated · {% now "F j, Y" %}</p>
+  </div>
+</section>
+
+{% endblock %}

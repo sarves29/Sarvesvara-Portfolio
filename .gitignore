@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 
 *.pdf
-migrations/
 
 # C extensions
 *.so
@@ -208,3 +207,19 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Node / frontend build
+node_modules/
+site_portfolio/static/site_portfolio/dist/
+
+# Django collectstatic output
+staticfiles/
+
+# Media uploads (keep local only)
+media/resumes/
+
+# Local deployment state
+deployment/gunicorn/logs/
+deployment/nginx/logs/
+*.sock
+.claude/

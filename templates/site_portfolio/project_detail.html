@@ -1,13 +1,154 @@
 {% extends 'site_portfolio/base.html' %}
-{% block content %}
-<div class="container">
-  <h1 class="text-center">{{ project.title }}</h2> <br>
+{% load static %}
 
-  <p  >{{ project.long_description }}</p><br>
-  <p>Tech:<br> {% for t in project.tech_tags %} <strong>{{ t }}</strong>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-  <br>
-  {% if project.github_url %}<p><a href="{{ project.github_url }}" target="_blank">GitHub</a></p>{% endif %}
-  <br>
-  {% if project.demo_url %}<p><a href="{{ project.demo_url }}" target="_blank">Live demo</a></p>{% endif %}
-</div>
+{% block title %}{{ project.title }} — {{ SITE_NAME }}{% endblock %}
+{% block description %}{{ project.short_summary }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ project.title }} — {{ SITE_NAME }}{% endblock %}
+{% block og_description %}{{ project.short_summary }}{% endblock %}
+
+{% block json_ld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  "name": "{{ project.title|escapejs }}",
+  "description": "{{ project.short_summary|escapejs }}",
+  "url": "{{ SITE_URL }}{{ request.path }}",
+  "dateCreated": "{{ project.created_at|date:'c' }}",
+  "author": {
+    "@type": "Person",
+    "name": "Sarvesvara Ramar",
+    "url": "{{ SITE_URL }}"
+  }{% if project.demo_url %},
+  "sameAs": "{{ project.demo_url }}"{% endif %}
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<article class="relative">
+
+  <header class="relative pt-32 md:pt-40 pb-16 md:pb-24">
+    <div class="mx-auto max-w-[1400px] px-6 md:px-10">
+      <a href="/#work" class="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.25em] text-paper/50 hover:text-flame transition-colors mb-10">
+        <span>←</span> Back to work
+      </a>
+
+      <p class="section-label mb-4" data-reveal="up">Case study · {{ project.year|default:"" }}</p>
+
+      <h1 class="font-display font-medium leading-tight text-balance tracking-tight" data-split="words" style="font-size: clamp(1.75rem, 3.5vw, 3rem)">
+        {{ project.title }}
+      </h1>
+
+      <p class="mt-8 text-xl md:text-2xl text-paper/75 max-w-3xl text-pretty" data-reveal="up" data-reveal-delay="0.1">
+        {{ project.short_summary }}
+      </p>
+
+      <dl class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 border-t border-paper/15 pt-8" data-reveal-stagger>
+        <div>
+          <dt class="section-label">Role</dt>
+          <dd class="mt-2 font-display text-2xl text-paper">{{ project.role|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt class="section-label">Company</dt>
+          <dd class="mt-2 font-display text-2xl text-paper">{{ project.company|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt class="section-label">Year</dt>
+          <dd class="mt-2 font-display text-2xl text-paper">{{ project.year|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt class="section-label">Status</dt>
+          <dd class="mt-2 font-display text-2xl text-flame">Shipped</dd>
+        </div>
+      </dl>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1400px] px-6 md:px-10">
+
+    {% if project.problem %}
+    <section class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 py-12 md:py-20 border-t border-paper/15" data-reveal="up">
+      <div class="md:col-span-3">
+        <p class="section-label sticky top-28">01 — Problem</p>
+      </div>
+      <div class="md:col-span-8 md:col-start-5">
+        <p class="font-display text-lg md:text-xl leading-snug text-balance tracking-tight text-paper">{{ project.problem }}</p>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if project.approach %}
+    <section class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 py-12 md:py-20 border-t border-paper/15" data-reveal="up">
+      <div class="md:col-span-3">
+        <p class="section-label sticky top-28">02 — Approach</p>
+      </div>
+      <div class="md:col-span-8 md:col-start-5 space-y-6 text-lg text-paper/85 leading-relaxed text-pretty">
+        {% for para in project.approach.splitlines %}
+          {% if para %}<p>{{ para }}</p>{% endif %}
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if project.outcome %}
+    <section class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 py-12 md:py-20 border-t border-paper/15" data-reveal="up">
+      <div class="md:col-span-3">
+        <p class="section-label sticky top-28">03 — Outcome</p>
+      </div>
+      <div class="md:col-span-8 md:col-start-5">
+        <p class="font-display text-lg md:text-xl leading-snug text-balance tracking-tight text-paper">{{ project.outcome }}</p>
+
+        {% if project.metrics_list %}
+        <ul class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4" data-reveal-stagger>
+          {% for m in project.metrics_list %}
+            <li class="card-bento p-5">
+              <span class="text-flame font-mono text-xs">◆</span>
+              <p class="mt-2 text-paper/85">{{ m }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="py-12 md:py-20 border-t border-paper/15" data-reveal="up">
+      <p class="section-label mb-6">04 — Tech stack</p>
+      <div class="flex flex-wrap gap-2">
+        {% for tag in project.tech_tags %}
+          <span class="chip text-xs">{{ tag }}</span>
+        {% endfor %}
+      </div>
+    </section>
+
+    {% if project.github_url or project.demo_url %}
+    <section class="py-12 md:py-16 border-t border-paper/15 flex flex-wrap gap-3" data-reveal="up">
+      {% if project.demo_url %}<a href="{{ project.demo_url }}" class="btn-primary" rel="noopener" data-magnetic="0.25">Live project ↗</a>{% endif %}
+      {% if project.github_url %}<a href="{{ project.github_url }}" class="btn-ghost" rel="noopener" data-magnetic="0.25">Source ↗</a>{% endif %}
+    </section>
+    {% endif %}
+
+  </div>
+
+  {% if related %}
+  <section class="mx-auto max-w-[1400px] px-6 md:px-10 pt-16 md:pt-24 pb-8">
+    <p class="section-label mb-8">More work</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {% for other in related %}
+      <a href="{% url 'site_portfolio:project_detail' other.slug %}" class="card-bento group" data-reveal="up">
+        <p class="section-label mb-3">{{ other.year|default:"—" }}</p>
+        <h3 class="font-display text-3xl leading-[1] text-balance group-hover:text-flame transition-colors duration-500">{{ other.title }}</h3>
+        <p class="mt-3 text-paper/70">{{ other.short_summary }}</p>
+        <span class="link-arrow mt-6 text-sm">Read the case</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</article>
+
 {% endblock %}

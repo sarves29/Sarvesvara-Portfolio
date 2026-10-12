@@ -1,0 +1,45 @@
+# ================================================================
+# sarvesvara-portfolio.service
+# DRAFT — do NOT install yet.
+#
+# Pre-install checklist (run ONCE before enabling the unit):
+#   cd /opt/Sarvesvara-Portfolio
+#   ./venv/bin/pip install -r requirements.txt
+#   ./venv/bin/python manage.py migrate
+#   npm ci && npm run build            # produces dist/app.{css,js}
+#   ./venv/bin/python manage.py collectstatic --noinput
+#   mkdir -p deployment/gunicorn/logs deployment/nginx/logs
+#   # ensure .env has DJANGO_DEBUG=False + the real SITE_URL
+#
+# Install:
+#   sudo cp deployment/systemd/sarvesvara-portfolio.service \
+#           /etc/systemd/system/sarvesvara-portfolio.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now sarvesvara-portfolio
+#   sudo systemctl status sarvesvara-portfolio
+#
+# NOTE: .env is read by python-dotenv from settings.py — systemd does
+# NOT need EnvironmentFile (it also mis-parses quoted values).
+# ================================================================
+
+[Unit]
+Description=Gunicorn daemon for Sarvesvara portfolio (Django)
+After=network.target
+
+[Service]
+User=sarves
+Group=www-data
+WorkingDirectory=/opt/Sarvesvara-Portfolio
+Environment="PATH=/opt/Sarvesvara-Portfolio/venv/bin"
+ExecStart=/opt/Sarvesvara-Portfolio/venv/bin/gunicorn \
+    --workers 3 \
+    --timeout 90 \
+    --bind unix:/opt/Sarvesvara-Portfolio/deployment/gunicorn/portfolio.sock \
+    --access-logfile /opt/Sarvesvara-Portfolio/deployment/gunicorn/logs/access.log \
+    --error-logfile /opt/Sarvesvara-Portfolio/deployment/gunicorn/logs/error.log \
+    portfolio_site.wsgi:application
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

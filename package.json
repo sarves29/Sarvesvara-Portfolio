@@ -1,0 +1,27 @@
+{
+  "name": "sarvesvara-portfolio-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend build pipeline for Sarvesvara Ramar's portfolio.",
+  "scripts": {
+    "css:build": "tailwindcss -i ./frontend/src/app.css -o ./site_portfolio/static/site_portfolio/dist/app.css --minify",
+    "css:watch": "tailwindcss -i ./frontend/src/app.css -o ./site_portfolio/static/site_portfolio/dist/app.css --watch",
+    "js:build": "esbuild frontend/src/app.js --bundle --minify --format=esm --target=es2020 --splitting --outdir=site_portfolio/static/site_portfolio/dist --entry-names=app",
+    "js:watch": "esbuild frontend/src/app.js --bundle --format=esm --target=es2020 --splitting --outdir=site_portfolio/static/site_portfolio/dist --entry-names=app --watch --sourcemap",
+    "build": "npm run css:build && npm run js:build",
+    "dev": "npm-run-all --parallel css:watch js:watch"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "esbuild": "^0.24.0",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14"
+  },
+  "dependencies": {
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.13",
+    "lottie-web": "^5.12.2",
+    "three": "^0.170.0"
+  }
+}

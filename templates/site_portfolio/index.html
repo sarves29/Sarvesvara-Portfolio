@@ -1,114 +1,617 @@
 {% extends 'site_portfolio/base.html' %}
-{% block content %}
 {% load static %}
 
-<!-- Hero Section with Background Video -->
-<div class="relative mx-auto px-4 py-10 mt-5 overflow-hidden justify-center">
-  <!-- Glass container -->
-  <div class="relative glass p-10 mx-auto shadow-lg overflow-hidden" style="max-width: 90%;">
-    <!-- 🎬 Video background (inside the card only) -->
-    <div class="hero-video-bg" style="margin-left: 16%;">
-      <video autoplay loop muted playsinline>
-        <source src="{% static 'site_portfolio/videos/background-video.mp4' %}" type="video/mp4">
-      </video>
-    </div>
+{% block json_ld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Sarvesvara Ramar",
+  "jobTitle": "Full-Stack / Product Engineer",
+  "url": "{{ SITE_URL }}",
+  "email": "mailto:sarvesvarasar@gmail.com",
+  "image": "{{ SITE_URL }}{% static 'site_portfolio/images/portfolio_image.png' %}",
+  "address": {"@type": "PostalAddress", "addressLocality": "Chennai", "addressCountry": "IN"},
+  "sameAs": [
+    "https://github.com/{{ GITHUB_USERNAME }}",
+    "https://linkedin.com/in/sarvesvara-ramar"
+  ],
+  "knowsAbout": ["Django", "Python", "PostgreSQL", "AWS", "Neptune", "RAG", "Flutter", "System Design"],
+  "alumniOf": {"@type": "CollegeOrUniversity", "name": "PSNACET"}
+}
+</script>
+{% endblock %}
 
-    <div class="row items-center">
-      <!-- Left Content -->
-      <div class="col-md-8">
-        <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">
-          Hey, I'm <span class="text-cyan-400">Sarvesvara Ramar</span>
-        </h1>
-        <p class="mt-4 text-gray-200 max-w-xl">
-          I build scalable, production-ready web applications using Django and React,
-          integrating cloud and LLM-powered features for smarter systems,
-          with a strong focus on automation, performance, and real-world usability.
-        </p>
+{% block content %}
 
-        <div class="mt-6 flex gap-3">
-          <a href="{% url 'site_portfolio:download_resume' %}" class="border border-gray-500 px-4 py-2 rounded hover:bg-gray-900 transition">
-            Download Resume
-          </a>
+{# Interactive 3D tubes — fixed behind the hero, fades out on scroll past the fold #}
+<div class="tubes-bg" aria-hidden="true">
+  <canvas id="tubes-canvas" data-lib-src="{% static 'site_portfolio/vendor/tubes1.min.js' %}"></canvas>
+</div>
+
+{# HERO — bento grid, photo natural, dense tiles, small type #}
+<section class="relative z-10 pt-24 md:pt-28 pb-12">
+  <div class="mx-auto max-w-[1400px] px-6 md:px-10">
+    <div class="grid grid-cols-12 gap-3 md:gap-4">
+
+      {# Photo tile — spans 4 cols, tall #}
+      <div class="col-span-12 sm:col-span-6 md:col-span-4 row-span-2 cell overflow-hidden p-0" data-reveal="up">
+        <picture>
+          <source type="image/webp" srcset="{% static 'site_portfolio/images/portfolio_image_md.webp' %} 800w, {% static 'site_portfolio/images/portfolio_image_lg.webp' %} 1200w" sizes="(min-width: 768px) 360px, 50vw">
+          <img src="{% static 'site_portfolio/images/portfolio_image_md.png' %}" alt="Sarvesvara Ramar" class="portrait" width="800" height="851" loading="eager" fetchpriority="high">
+        </picture>
+        <div class="absolute left-4 bottom-4 right-4 flex items-end justify-between">
+          <div>
+            <p class="font-mono text-[10px] uppercase tracking-[0.25em] text-paper/55">engineer</p>
+            <p class="text-paper font-medium text-lg leading-tight mt-0.5">Sarvesvara Ramar</p>
+          </div>
+          <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-ink/60 backdrop-blur border border-paper/10 font-mono text-[10px] uppercase tracking-wider text-paper/70">
+            <span class="w-1.5 h-1.5 rounded-full bg-flame animate-blink"></span>available
+          </span>
         </div>
       </div>
 
-      <!-- Right Profile Image -->
-      <div class="col-md-4 flex items-center justify-content-end mt-10 md:mt-0">
-        <div class="text-center">
-          <div class="w-64">
-            <img src="{% static 'site_portfolio/images/portfolio_image.png' %}" 
-                 alt="Profile Image" 
-                 class="object-cover w-full h-full rounded-2xl">
+      {# Pitch tile — the "headline" but smaller, denser #}
+      <div class="col-span-12 sm:col-span-6 md:col-span-5 cell">
+        <p class="k">/ what I do</p>
+        <p class="mt-2 text-paper text-[18px] md:text-[22px] leading-[1.25] font-medium tracking-tight">
+          Full-stack / product engineer. I ship <span class="text-flame">open graphs</span>, life-OSes, and the systems that <span class="text-flame">stay up</span>.
+        </p>
+        <p class="mt-4 text-paper/60 text-sm leading-relaxed">
+          Django · AWS · Flutter · RAG · CRDT. From first commit to 3 AM page.
+        </p>
+      </div>
+
+      {# Meta tile — location + time #}
+      <div class="col-span-6 md:col-span-3 cell">
+        <p class="k">location</p>
+        <p class="mt-1 text-paper text-base">Chennai, IN</p>
+        <p class="mt-3 k">local time</p>
+        <p class="mt-1 v" data-clock>{% now "H:i" %} IST</p>
+      </div>
+
+      {# Now shipping tile #}
+      <div class="col-span-6 md:col-span-3 cell">
+        <p class="k">now shipping</p>
+        <p class="mt-1 v">bleblubla</p>
+        <p class="mt-0.5 text-paper/60 text-xs">154 commits · 4 mo · 2.8M edges</p>
+        <a href="https://bleblubla.com" rel="noopener" class="mt-3 inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-flame hover:underline">bleblubla.com →</a>
+      </div>
+
+      {# Role tile #}
+      <div class="col-span-6 md:col-span-2 cell">
+        <p class="k">role</p>
+        <p class="mt-1 v">NEWPRODATA</p>
+        <p class="mt-0.5 text-paper/60 text-xs">Feb 2024 — now</p>
+      </div>
+
+      {# Years tile #}
+      <div class="col-span-6 md:col-span-2 cell">
+        <p class="k">experience</p>
+        <p class="mt-1 text-paper text-2xl font-medium leading-tight">2+ <span class="text-paper/50 text-sm font-normal">yrs</span></p>
+        <p class="mt-0.5 text-paper/60 text-xs">4 projects owned</p>
+      </div>
+
+      {# CTA tile — actions stacked #}
+      <div class="col-span-12 md:col-span-4 cell-accent flex flex-col sm:flex-row md:flex-col gap-2 justify-between">
+        <div>
+          <p class="k">get in touch</p>
+          <p class="mt-1 text-paper text-base">Open to full-time & contract.</p>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          <a href="mailto:sarvesvarasar@gmail.com" class="inline-flex items-center px-3.5 py-2 rounded-full bg-flame text-ink text-xs font-medium hover:bg-flame-light transition-colors">Email →</a>
+          <a href="{% url 'site_portfolio:download_resume' %}" class="inline-flex items-center px-3.5 py-2 rounded-full border border-paper/25 text-paper text-xs hover:border-flame hover:text-flame transition-colors">Resume</a>
+        </div>
+      </div>
+
+    </div>
+
+    {# Single thin status strip — replaces the big ribbon #}
+    <div class="mt-4 cell cell-tight bg-ink-soft/70 backdrop-blur-md flex flex-wrap items-center gap-x-5 gap-y-1 font-mono text-[11px] text-paper/60">
+      <span class="text-flame">/ now</span>
+      <span>bleblubla · neo4j → neptune shipped</span>
+      <span class="text-paper/20">·</span>
+      <span>plos · 2,538 tests green</span>
+      <span class="text-paper/20">·</span>
+      <span>datasprings · 347d up</span>
+      <span class="text-paper/20">·</span>
+      <span class="text-flame">↓ scroll for one real incident</span>
+    </div>
+  </div>
+</section>
+
+{# INCIDENT SCROLL-THEATER — signature move, retoned #}
+<section id="incident" class="incident relative bg-ink text-paper" data-incident aria-label="Incident case study" style="--steps: 6; min-height: calc(100vh + var(--steps) * 45vh);">
+  <div class="incident-stage md:sticky md:top-0 md:h-screen md:overflow-hidden">
+   <div class="mx-auto max-w-[1600px] px-6 md:px-10 md:h-full flex items-center">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 py-16 md:py-0 w-full">
+
+      <aside class="md:col-span-4 space-y-6">
+        <div>
+          <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-flame">01 · INCIDENT · {{ incident.severity }}</p>
+          <h2 class="mt-3 font-display text-2xl md:text-[28px] font-medium leading-tight tracking-tight text-balance">{{ incident.title }}</h2>
+          <p class="mt-3 text-paper/60 text-sm text-pretty">{{ incident.subtitle }}</p>
+        </div>
+
+        <dl class="grid grid-cols-2 gap-y-3 text-xs font-mono uppercase tracking-wider text-paper/50">
+          <dt>date</dt><dd class="text-paper/80">{{ incident.date }}</dd>
+          <dt>system</dt><dd class="text-paper/80">{{ incident.system }}</dd>
+          <dt>owner</dt><dd class="text-paper/80">{{ incident.owner }}</dd>
+          <dt>duration</dt><dd class="text-paper/80">{{ incident.duration_minutes }} min</dd>
+        </dl>
+
+        <ol class="incident-rail space-y-1 font-mono text-xs uppercase tracking-wider">
+          {% for s in incident.steps %}
+          <li data-rail="{{ s.idx }}" class="flex items-start gap-3 px-3 py-2 rounded-lg transition-colors duration-300 {% if forloop.first %}is-active{% endif %}">
+            <span class="rail-dot mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 bg-paper/20"></span>
+            <span class="rail-time w-10 text-paper/40 tabular-nums">{{ s.time }}</span>
+            <span class="rail-label flex-1 text-paper/60">{{ s.label }}</span>
+          </li>
+          {% endfor %}
+        </ol>
+
+        <div class="pt-4 border-t border-paper/10 hidden md:block">
+          <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-paper/40 mb-2">stack used</p>
+          <div class="flex flex-wrap gap-1.5">
+            {% for t in incident.coda.stack %}
+              <span class="px-2 py-0.5 font-mono text-[10px] rounded border border-paper/15 text-paper/70">{{ t }}</span>
+            {% endfor %}
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Down Arrow Button -->
-<div class="flex justify-center" style="margin-top: 7%;">
-    <a href="#projects" class="inline-block text-cyan-400 hover:text-cyan-200 transition flex flex-col items-center">
-      <div class="row">
-        <span class="col-md-9 text-sm mb-1 pe-0">View Projects</span>
-        <div class="col-md-3 ps-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 arrow-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      </div>
-    </a>
-  </div>
-<!-- Projects Section -->
-<div id="projects" class="max-w-6xl mx-auto px-4 py-12">
-  <h2 class="text-2xl font-bold mb-6">Selected Projects</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for project in projects %}
-      <article class="bg-gray-900/60 backdrop-blur-md border border-gray-700 p-6 rounded-lg hover:shadow-lg transition">
-        <h3 class="text-xl font-semibold">{{ project.title }}</h3>
-        <p class="mt-3 text-gray-400">{{ project.short_summary }}</p>
+      </aside>
 
-        <div class="mt-4 flex flex-wrap gap-2">
-          {% for tag in project.tech_tags %}
-            <span class="text-xs bg-gray-800 px-2 py-1 rounded">{{ tag }}</span>
+      <div class="md:col-span-8 relative">
+        <div class="incident-frames relative md:min-h-[620px]">
+          {% for s in incident.steps %}
+          <article class="incident-frame" data-frame="{{ s.idx }}" {% if forloop.first %}data-active{% endif %}>
+            <header class="flex items-baseline gap-3 mb-6">
+              <span class="font-mono text-[11px] uppercase tracking-[0.3em] text-flame tabular-nums">{{ s.time }} IST</span>
+              <span class="h-px flex-1 bg-paper/15"></span>
+              <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-paper/40">{{ s.phase }}</span>
+            </header>
+            <h3 class="font-display text-xl md:text-[22px] font-medium leading-snug tracking-tight text-balance mb-6">{{ s.headline }}</h3>
+
+            <div class="artifact">
+              {% if s.artifact.type == 'alert' %}
+                <div class="rounded-2xl border border-paper/10 bg-paper/[0.04] overflow-hidden">
+                  <div class="flex items-center gap-2 px-4 py-2.5 border-b border-paper/10 bg-paper/[0.03]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-flame"></span>
+                    <span class="font-mono text-[11px] text-paper/70">{{ s.artifact.channel }}</span>
+                    <span class="ml-auto font-mono text-[10px] text-paper/40">{{ s.artifact.author }}</span>
+                  </div>
+                  <div class="px-4 py-3 space-y-1 font-mono text-[12px] text-paper/80">
+                    {% for line in s.artifact.lines %}<div>{{ line }}</div>{% endfor %}
+                  </div>
+                </div>
+              {% elif s.artifact.type == 'log' %}
+                <figure class="rounded-2xl border border-paper/10 bg-[#0a0a0a]">
+                  <figcaption class="px-4 py-2 border-b border-paper/10 font-mono text-[10px] uppercase tracking-[0.2em] text-paper/40">{{ s.artifact.caption }}</figcaption>
+                  <pre class="px-4 py-3 font-mono text-[12px] text-paper/85 leading-[1.7] overflow-x-auto"><code>{% for line in s.artifact.lines %}{{ line }}
+{% endfor %}</code></pre>
+                </figure>
+              {% elif s.artifact.type == 'reasoning' %}
+                <ul class="rounded-2xl border border-paper/10 bg-paper/[0.03] p-5 space-y-3">
+                  {% for b in s.artifact.bullets %}
+                    <li class="flex gap-3 text-sm text-paper/80"><span class="text-flame shrink-0">◆</span><span>{{ b }}</span></li>
+                  {% endfor %}
+                </ul>
+              {% elif s.artifact.type == 'diff' %}
+                <figure class="rounded-2xl border border-paper/10 bg-[#0a0a0a] overflow-hidden">
+                  <figcaption class="px-4 py-2 border-b border-paper/10 flex items-center gap-3">
+                    <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-paper/40">diff</span>
+                    <span class="font-mono text-[11px] text-paper/70">{{ s.artifact.file }}</span>
+                  </figcaption>
+                  <pre class="font-mono text-[12px] leading-[1.7]"><code>{% for dl in s.artifact.lines %}{% if dl.kind == 'add' %}<span class="diff-add block px-4 bg-flame/10 text-paper">+ {{ dl.text }}</span>{% elif dl.kind == 'del' %}<span class="diff-del block px-4 bg-paper/[0.06] text-paper/50 line-through-muted">- {{ dl.text }}</span>{% else %}<span class="diff-ctx block px-4 text-paper/70">  {{ dl.text }}</span>{% endif %}{% endfor %}</code></pre>
+                </figure>
+              {% elif s.artifact.type == 'metric' %}
+                <figure class="rounded-2xl border border-paper/10 bg-paper/[0.03] p-5">
+                  <figcaption class="flex items-baseline justify-between mb-4">
+                    <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-paper/50">{{ s.artifact.caption }}</span>
+                    <span class="font-mono text-[10px] text-paper/40">unit · {{ s.artifact.unit }}</span>
+                  </figcaption>
+                  <div class="metric-chart">
+                    <svg viewBox="0 0 100 42" preserveAspectRatio="none" class="w-full h-48" data-svg>
+                      <line x1="0" y1="42" x2="100" y2="42" stroke="rgba(237,232,223,0.1)" stroke-width="0.3"/>
+                    </svg>
+                  </div>
+                  <div class="mt-4 flex flex-wrap gap-4 font-mono text-[11px]">
+                    {% for ser in s.artifact.series %}
+                      <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-sm" style="background:{{ ser.color }}"></span><span class="text-paper/60">{{ ser.name }}</span></span>
+                    {% endfor %}
+                  </div>
+                </figure>
+              {% endif %}
+            </div>
+
+            {% if s.note %}
+              <p class="mt-5 font-display italic text-paper/60 text-lg">&ldquo;{{ s.note }}&rdquo;</p>
+            {% endif %}
+          </article>
           {% endfor %}
         </div>
+      </div>
 
-        <div class="mt-4">
-          <a href="{% url 'site_portfolio:project_detail' project.slug %}" class="text-cyan-400 hover:underline">Read more →</a>
-        </div>
-      </article>
-    {% endfor %}
-  </div>
-</div>
-
-<!-- About Section -->
-<div id="about" class="max-w-6xl mx-auto px-4 py-12">
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-    <div class="md:col-span-2">
-      <h2 class="text-2xl font-bold">About Me</h2>
-      <p class="mt-4 text-gray-300">
-        I’m a results-driven Python Full-Stack Developer specializing in building scalable web applications with Django and React.
-        I integrate AI, automation, and cloud to deliver production-ready systems.
-      </p>
-
-      <ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-300">
-        <li>Python, Django, Flask</li>
-        <li>React, JavaScript, AJAX</li>
-        <li>MySQL, PostgreSQL, Neo4j</li>
-        <li>AWS (EC2, S3, Lambda, Bedrock)</li>
-      </ul>
     </div>
+   </div>
 
-    <div class="p-6 bg-gray-900/60 backdrop-blur-md border border-gray-700 rounded-lg">
-      <h3 class="font-semibold">Contact</h3>
-      <p class="text-gray-400 mt-2">Email: sarvesvarasar@gmail.com</p>
-      <p class="text-gray-400">Phone: +91 95975 19919</p>
-      <div class="mt-4">
-        <a href="{% url 'site_portfolio:contact' %}" class="inline-block bg-cyan-500 px-3 py-2 rounded text-black font-semibold hover:bg-cyan-400">
-          Send a message
+    <div class="incident-progress hidden md:block absolute bottom-0 inset-x-0 h-px bg-paper/10">
+      <div class="incident-progress-bar h-px bg-flame origin-left scale-x-0"></div>
+    </div>
+  </div>
+
+  {{ incident.steps|json_script:"incident-data" }}
+</section>
+
+{# CODA — own section AFTER the sticky stage unpins, so it can't overlap it #}
+<section id="incident-coda" class="relative">
+  <div class="mx-auto max-w-[1400px] px-6 md:px-10 pt-16 pb-20 border-t border-paper/10">
+    <div class="grid grid-cols-12 gap-3 md:gap-4">
+      <div class="col-span-12 md:col-span-8 cell bg-ink-soft">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-flame/15 border border-flame/30 font-mono text-[10px] uppercase tracking-wider text-flame">
+            <span class="w-1.5 h-1.5 rounded-full bg-flame"></span>resolved
+          </span>
+          <span class="font-mono text-[10px] uppercase tracking-[0.25em] text-paper/45">/ takeaway</span>
+        </div>
+        <p class="text-paper text-base md:text-lg leading-snug font-medium tracking-tight text-pretty">
+          &ldquo;{{ incident.coda.takeaway }}&rdquo;
+        </p>
+      </div>
+      <div class="col-span-12 md:col-span-4 cell bg-ink-soft flex flex-col justify-between">
+        <div>
+          <p class="k">more incidents</p>
+          <p class="mt-1 text-paper text-sm">More I can walk you through, each with receipts.</p>
+        </div>
+        <a href="{% url 'site_portfolio:contact' %}" class="mt-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-flame hover:underline">
+          ask about another →
         </a>
       </div>
     </div>
   </div>
-</div>
+</section>
+
+{# SYSTEMS I RUN — continuous ink #}
+<section id="ops" class="relative" aria-label="Live systems">
+  <div class="mx-auto max-w-[1600px] px-6 md:px-10 py-20 md:py-28">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10">
+      <aside class="md:col-span-4" data-reveal="up">
+        <p class="section-label mb-4">02 — Systems I run</p>
+        <h2 class="font-display font-medium text-balance text-paper tracking-tight" style="font-size: clamp(1.5rem, 2.5vw, 2.25rem)">
+          Five production hosts, <span class="text-flame">one pager</span>.
+        </h2>
+        <p class="mt-4 text-paper/60 text-sm text-pretty max-w-sm">
+          Nginx + systemd + AWS + self-hosted boxes. Uptime, p99, and the 3 AM page — mine.
+        </p>
+      </aside>
+      <div class="md:col-span-8 cell bg-ink-soft font-mono text-sm md:text-base leading-[2.0]" data-reveal="up" data-reveal-delay="0.1">
+        <div class="mb-4">
+          <span class="text-flame">sarvesvara@prod</span><span class="text-paper/40"> ~ </span><span class="text-paper">$ uptime --hosts</span>
+        </div>
+        <div class="grid grid-cols-[1fr_auto_auto] gap-x-6 md:gap-x-10 text-paper/80">
+          <div class="text-paper/40 text-[10px] uppercase tracking-[0.2em] pb-3 border-b border-paper/10">host</div>
+          <div class="text-paper/40 text-[10px] uppercase tracking-[0.2em] pb-3 border-b border-paper/10 text-right">uptime</div>
+          <div class="text-paper/40 text-[10px] uppercase tracking-[0.2em] pb-3 border-b border-paper/10 text-right">p99</div>
+
+          <a href="https://bleblubla.com" rel="noopener" class="flex items-center gap-3 py-3 group hover:text-flame">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-flame animate-blink"></span>
+            <span>bleblubla.com</span>
+          </a>
+          <div class="py-3 text-right tabular-nums text-paper/70">up 82d</div>
+          <div class="py-3 text-right tabular-nums text-paper/70">—</div>
+
+          <a href="https://plos.datasprings.in" rel="noopener" class="flex items-center gap-3 py-3 group hover:text-flame">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-flame animate-blink"></span>
+            <span>plos.datasprings.in</span>
+          </a>
+          <div class="py-3 text-right tabular-nums text-paper/70">up 118d</div>
+          <div class="py-3 text-right tabular-nums text-paper/70">61 ms</div>
+
+          <a href="https://datasprings.in" rel="noopener" class="flex items-center gap-3 py-3 group hover:text-flame">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-flame animate-blink"></span>
+            <span>datasprings.in</span>
+          </a>
+          <div class="py-3 text-right tabular-nums text-paper/70">up 347d</div>
+          <div class="py-3 text-right tabular-nums text-paper/70">42 ms</div>
+
+          <a href="https://timepaq.app" rel="noopener" class="flex items-center gap-3 py-3 group hover:text-flame">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-flame animate-blink"></span>
+            <span>timepaq.app</span>
+          </a>
+          <div class="py-3 text-right tabular-nums text-paper/70">up 200d+</div>
+          <div class="py-3 text-right tabular-nums text-paper/70">—</div>
+
+          <a href="https://pokisham.com" rel="noopener" class="flex items-center gap-3 py-3 group hover:text-flame">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-flame animate-blink"></span>
+            <span>pokisham.com</span>
+          </a>
+          <div class="py-3 text-right tabular-nums text-paper/70">up 203d</div>
+          <div class="py-3 text-right tabular-nums text-paper/70">29 ms</div>
+        </div>
+        <p class="mt-8 text-[11px] text-paper/40">
+          <span class="text-paper/30"># </span>5 hosts · nginx · aws + self-hosted · paired production ownership
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# WORK #}
+<section id="work" class="relative pt-16 md:pt-28 pb-16 border-t border-paper/10">
+  <div class="mx-auto max-w-[1600px] px-6 md:px-10">
+    <div class="flex items-end justify-between gap-6 mb-12" data-reveal="up">
+      <div>
+        <p class="section-label mb-4">03 — Selected work</p>
+        <h2 class="font-display font-medium text-balance max-w-2xl text-paper tracking-tight" style="font-size: clamp(1.5rem, 2.5vw, 2.25rem)">Systems I've <span class="text-flame">owned</span>, shipped, and kept alive.</h2>
+      </div>
+      <a href="{% url 'site_portfolio:contact' %}" class="hidden md:inline-flex link-arrow text-sm shrink-0">Discuss a project</a>
+    </div>
+
+    <ol class="divide-y divide-paper/10 border-y border-paper/10">
+      {% for project in projects %}
+      <li>
+        <a href="{% url 'site_portfolio:project_detail' project.slug %}" class="group relative grid grid-cols-12 gap-4 py-8 md:py-10 items-baseline hover:bg-paper/[0.03] transition-colors duration-500 px-2 md:px-6 -mx-2 md:-mx-6" data-reveal="up">
+          <span class="col-span-1 font-mono text-xs text-paper/40 self-start pt-1">0{{ forloop.counter }}</span>
+          <div class="col-span-11 md:col-span-7">
+            <h3 class="font-display font-medium text-xl md:text-2xl leading-tight tracking-tight text-balance text-paper group-hover:text-flame transition-colors duration-300">{{ project.title }}</h3>
+            <p class="mt-3 text-paper/70 max-w-2xl text-pretty">{{ project.short_summary }}</p>
+          </div>
+          <div class="hidden md:flex col-span-3 flex-wrap gap-1.5 pt-2">
+            {% for tag in project.tech_tags|slice:":4" %}
+              <span class="chip text-[10px]">{{ tag }}</span>
+            {% endfor %}
+          </div>
+          <div class="col-span-12 md:col-span-1 flex md:justify-end items-start pt-2">
+            <span class="font-mono text-[11px] uppercase tracking-[0.25em] text-paper/40 group-hover:text-flame transition-colors duration-500">{{ project.year|default:"—" }}</span>
+          </div>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+{# ABOUT — bento grid #}
+<section id="about" class="relative pt-16 md:pt-28 pb-24">
+  <div class="mx-auto max-w-[1600px] px-6 md:px-10">
+    <div class="mb-12" data-reveal="up">
+      <p class="section-label mb-4">04 — About</p>
+      <h2 class="font-display font-medium text-balance max-w-3xl text-paper tracking-tight" style="font-size: clamp(1.5rem, 2.5vw, 2.25rem)">I take responsibility for systems, <span class="text-flame">outcomes</span>, and the people who rely on them.</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div class="md:col-span-7 card-bento" data-reveal="up">
+        <p class="section-label mb-4">Who I am</p>
+        <p class="text-lg md:text-xl leading-relaxed text-paper/85 text-pretty">
+          Full-stack / product engineer in Chennai. I design, build, deploy, and operate production systems — the full arc, not just the fun parts. Django + AWS + RAG by day, Flutter + CRDT + robot hardware by night.
+        </p>
+        <p class="mt-4 text-paper/70 text-pretty">
+          Known on my team for owning projects independently — requirements, architecture, delivery, on-call, optimization. I'd rather fix the root cause than paper over it.
+        </p>
+      </div>
+
+      <div class="md:col-span-5 card-bento bg-flame/10 border-flame/30" data-reveal="up" data-reveal-delay="0.1">
+        <p class="section-label mb-6 text-paper/70">At a glance</p>
+        <ul class="space-y-4">
+          <li class="flex items-baseline justify-between gap-4">
+            <span class="font-display text-3xl font-medium text-flame leading-none tabular-nums">2+</span>
+            <span class="text-sm text-paper/80 text-right">years shipping production systems end-to-end</span>
+          </li>
+          <li class="flex items-baseline justify-between gap-4">
+            <span class="font-display text-3xl font-medium text-flame leading-none tabular-nums">4</span>
+            <span class="text-sm text-paper/80 text-right">parallel projects owned across two servers</span>
+          </li>
+          <li class="flex items-baseline justify-between gap-4">
+            <span class="font-display text-3xl font-medium text-flame leading-none">∞</span>
+            <span class="text-sm text-paper/80 text-right">production incidents handled solo — on-call is just Tuesday</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="md:col-span-4 card-bento" data-reveal="up">
+        <p class="section-label mb-4">Stack</p>
+        <div class="space-y-3 font-mono text-xs uppercase tracking-wider text-paper/70">
+          <p><span class="text-flame">◆</span> Django · Flask · REST · JWT · SSO</p>
+          <p><span class="text-flame">◆</span> PostgreSQL · MySQL · Neo4j · Neptune</p>
+          <p><span class="text-flame">◆</span> AWS · Bedrock · Comprehend · SES</p>
+          <p><span class="text-flame">◆</span> Flutter · Dart · React · jQuery</p>
+          <p><span class="text-flame">◆</span> Nginx · uWSGI · Docker · Systemd</p>
+          <p><span class="text-flame">◆</span> Claude · Gemini · RAG · vector stores</p>
+        </div>
+      </div>
+
+      <div class="md:col-span-4 card-bento" data-reveal="up" data-reveal-delay="0.1">
+        <p class="section-label mb-4">What I own</p>
+        <ul class="space-y-3 text-paper/80 text-sm">
+          <li class="flex gap-3"><span class="text-flame shrink-0">→</span> Architecture &amp; data modeling</li>
+          <li class="flex gap-3"><span class="text-flame shrink-0">→</span> API design &amp; third-party integration</li>
+          <li class="flex gap-3"><span class="text-flame shrink-0">→</span> Deployment · Nginx · uWSGI · CDK</li>
+          <li class="flex gap-3"><span class="text-flame shrink-0">→</span> Production support &amp; incident response</li>
+          <li class="flex gap-3"><span class="text-flame shrink-0">→</span> Client communication &amp; delivery</li>
+        </ul>
+      </div>
+
+      <div class="md:col-span-4 card-bento" data-reveal="up" data-reveal-delay="0.2">
+        <p class="section-label mb-4">Education &amp; more</p>
+        <p class="text-sm text-paper/80"><strong class="text-paper">B.E. Computer Science</strong><br>PSNACET, 2023 · CGPA 7.7</p>
+        <p class="mt-4 text-sm text-paper/70">Executive Member · Youth Red Cross Club</p>
+        <p class="mt-6 font-mono text-[11px] uppercase tracking-[0.25em] text-paper/40">Interested in</p>
+        <p class="mt-2 text-xs text-paper/70">Full-stack · system architecture · AI automation · scalable systems</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# AI CHAT #}
+<section id="ai-chat" class="relative py-20 md:py-28 bg-ink-soft border-y border-paper/10 scroll-mt-24">
+  <div class="mx-auto max-w-[1600px] px-6 md:px-10">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+      <div class="md:col-span-7" data-reveal="up">
+        <p class="section-label mb-4">05 — Ask me anything</p>
+        <h2 class="font-display font-medium text-paper text-balance leading-tight tracking-tight" style="font-size: clamp(1.5rem, 2.5vw, 2.25rem)">Got a question about my work? <span class="text-flame">Ask my resume.</span></h2>
+        <p class="mt-6 text-paper/70 max-w-2xl text-pretty">An AI trained on my resume, projects, and the systems I've shipped. Ask about my experience, stack, or whether I'd fit your team — it answers from real work, not marketing copy.</p>
+        <div class="mt-6 flex flex-wrap gap-2" data-ai-suggestions>
+          <button type="button" data-ai-suggestion="What's Sarvesvara's strongest stack?" class="px-3 py-1.5 rounded-full border border-paper/15 text-xs font-mono uppercase tracking-wider text-paper/70 hover:bg-flame hover:text-ink hover:border-flame transition">strongest stack</button>
+          <button type="button" data-ai-suggestion="Walk me through BleBluBla." class="px-3 py-1.5 rounded-full border border-paper/15 text-xs font-mono uppercase tracking-wider text-paper/70 hover:bg-flame hover:text-ink hover:border-flame transition">bleblubla walkthrough</button>
+          <button type="button" data-ai-suggestion="How much AWS experience does he have?" class="px-3 py-1.5 rounded-full border border-paper/15 text-xs font-mono uppercase tracking-wider text-paper/70 hover:bg-flame hover:text-ink hover:border-flame transition">aws experience</button>
+          <button type="button" data-ai-suggestion="Would he be a good fit for a full-stack role with AI/RAG work?" class="px-3 py-1.5 rounded-full border border-paper/15 text-xs font-mono uppercase tracking-wider text-paper/70 hover:bg-flame hover:text-ink hover:border-flame transition">full-stack + ai fit</button>
+        </div>
+      </div>
+      <div class="md:col-span-5 rounded-3xl bg-ink border border-paper/10 p-8" data-reveal="up" data-reveal-delay="0.15">
+        <div class="flex items-center justify-between gap-2 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-flame animate-blink" data-ai-dot></span>
+            <span class="font-mono text-[11px] uppercase tracking-[0.25em] text-paper/60" data-ai-status>Live · Gemini</span>
+          </div>
+          <span class="font-mono text-[10px] uppercase tracking-[0.25em] text-paper/40" data-ai-meta></span>
+        </div>
+        <form data-ai-form class="flex flex-col gap-3">
+          {% csrf_token %}
+          <label for="ai-question" class="text-paper/80 text-sm">Try asking:</label>
+          <input id="ai-question" data-ai-input type="text" maxlength="500" autocomplete="off" placeholder="What's his strongest stack?" class="w-full bg-paper/5 border border-paper/10 rounded-2xl px-4 py-3 text-paper placeholder:text-paper/30 focus:outline-none focus:border-flame">
+          <button type="submit" data-ai-submit class="btn-primary w-full justify-center disabled:opacity-60 disabled:cursor-not-allowed">Ask →</button>
+        </form>
+        <div data-ai-output class="mt-4 text-sm text-paper/80 min-h-[3rem] whitespace-pre-wrap leading-relaxed"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# CONTACT CTA — terminal + availability panel #}
+<section class="relative py-20 md:py-28">
+  <div class="mx-auto max-w-[1400px] px-6 md:px-10">
+    <div class="flex items-baseline gap-3 mb-12" data-reveal="up">
+      <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-flame tabular-nums">06</span>
+      <span class="h-px flex-1 bg-paper/15"></span>
+      <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-paper/40">say hi</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      {# LEFT — terminal + headline #}
+      <div class="lg:col-span-7 flex flex-col gap-8" data-reveal="up">
+        <div class="rounded-2xl bg-ink-soft border border-paper/10 overflow-hidden shadow-2xl">
+          <div class="bg-[#1F2229] px-4 py-3 flex items-center justify-between border-b border-paper/5">
+            <div class="flex gap-2">
+              <div class="w-3 h-3 rounded-full bg-[#FF5F56]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#FFBD2E]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#27C93F]"></div>
+            </div>
+            <div class="font-mono text-[11px] text-paper/40 tracking-tight">sarvesvara@portfolio — zsh</div>
+            <div class="w-12"></div>
+          </div>
+          <div class="p-6 font-mono text-sm md:text-[15px] leading-relaxed space-y-2">
+            <div class="flex gap-3">
+              <span class="text-flame">~</span>
+              <span class="text-paper/40">»</span>
+              <span class="text-paper">ssh sarvesvara@portfolio</span>
+            </div>
+            <div class="text-paper/60 text-xs">connected · secure · 42ms</div>
+            <div class="pt-4 space-y-1.5">
+              <div class="flex items-center gap-3 flex-wrap">
+                <span class="text-flame text-xs">&gt;</span>
+                <span class="text-paper/80">project inquiry:</span>
+                <span class="text-flame bg-flame/10 px-2 py-0.5 rounded text-xs">ready to brief</span>
+              </div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <span class="text-flame text-xs">&gt;</span>
+                <span class="text-paper/80">contract work:</span>
+                <span class="text-paper/50 text-xs">accepting Q2 · 2026</span>
+              </div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <span class="text-flame text-xs">&gt;</span>
+                <span class="text-paper/80">full-time role:</span>
+                <span class="text-paper/50 text-xs">open · remote ok</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h2 class="font-display font-medium text-[28px] md:text-[32px] text-paper tracking-tight leading-tight">
+          Let's <span class="text-flame">brief</span> a system.
+        </h2>
+      </div>
+
+      {# RIGHT — availability + contact rows #}
+      <div class="lg:col-span-5 flex flex-col gap-4" data-reveal="up" data-reveal-delay="0.1">
+
+        <div class="rounded-2xl bg-ink-soft border border-paper/10 p-6 flex flex-col gap-5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-flame animate-blink shadow-[0_0_8px_rgba(47,224,200,0.6)]"></span>
+              <span class="font-mono text-[10px] tracking-[0.2em] text-paper/80 uppercase">available · chennai · gmt+5:30</span>
+            </div>
+            <span class="font-mono text-[10px] text-paper/40 uppercase">this week</span>
+          </div>
+          <div class="grid grid-cols-7 gap-2" aria-hidden="true">
+            {# 7 days × 3 slots; teal opacity = free, paper opacity = busy #}
+            {% spaceless %}
+            {% for col in "0,3,6,9,12,15,18"|make_list %}{% endfor %}
+            {% endspaceless %}
+            <div class="space-y-2">
+              <div class="h-6 rounded bg-flame/25 border border-flame/10"></div>
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+              <div class="h-6 rounded bg-flame/45 border border-flame/20"></div>
+            </div>
+            <div class="space-y-2">
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+              <div class="h-6 rounded bg-flame/25 border border-flame/10"></div>
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+            </div>
+            <div class="space-y-2">
+              <div class="h-6 rounded bg-flame/60 border border-flame/30"></div>
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+              <div class="h-6 rounded bg-flame/25 border border-flame/10"></div>
+            </div>
+            <div class="space-y-2">
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+            </div>
+            <div class="space-y-2">
+              <div class="h-6 rounded bg-flame/35 border border-flame/15"></div>
+              <div class="h-6 rounded bg-flame/25 border border-flame/10"></div>
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+            </div>
+            <div class="space-y-2">
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+              <div class="h-6 rounded bg-flame/45 border border-flame/20"></div>
+            </div>
+            <div class="space-y-2">
+              <div class="h-6 rounded bg-flame/25 border border-flame/10"></div>
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+              <div class="h-6 rounded bg-paper/5 border border-paper/5"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 font-mono text-[10px] uppercase tracking-wider text-paper/40">
+            <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm bg-flame/50"></span>free</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm bg-paper/10"></span>booked</span>
+          </div>
+        </div>
+
+        <a class="group rounded-2xl bg-ink-soft border border-paper/10 hover:border-flame/50 p-5 flex items-center justify-between transition-all duration-300" href="mailto:sarvesvarasar@gmail.com" data-magnetic="0.2">
+          <div class="flex items-center gap-6">
+            <span class="font-mono text-[10px] tracking-[0.25em] text-paper/40 uppercase">email</span>
+            <span class="font-mono text-sm text-paper/85">sarvesvarasar@gmail.com</span>
+          </div>
+          <span class="text-flame transition-transform duration-300 group-hover:translate-x-1">→</span>
+        </a>
+
+        <a class="group rounded-2xl bg-ink-soft border border-paper/10 hover:border-flame/50 p-5 flex items-center justify-between transition-all duration-300" href="{% url 'site_portfolio:contact' %}" data-magnetic="0.2">
+          <div class="flex items-center gap-6">
+            <span class="font-mono text-[10px] tracking-[0.25em] text-paper/40 uppercase">brief</span>
+            <span class="font-mono text-sm text-paper/85">Structured project form</span>
+          </div>
+          <span class="text-flame transition-transform duration-300 group-hover:translate-x-1">→</span>
+        </a>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block body_extra %}
+<script type="module" src="{% static 'site_portfolio/js/tubes-init.js' %}"></script>
 {% endblock %}

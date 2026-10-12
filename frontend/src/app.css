@@ -1,0 +1,229 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-ink text-paper font-sans antialiased;
+    background-image:
+      radial-gradient(1200px 600px at 85% -5%, rgba(47, 224, 200, 0.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 105%, rgba(47, 224, 200, 0.04), transparent 55%);
+  }
+
+  ::selection {
+    background-color: #2FE0C8;
+    color: #0F1115;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-paper;
+  }
+}
+
+@layer components {
+  .hairline {
+    @apply border-t border-paper/15;
+  }
+
+  /* Photo kept natural — no duotone */
+  .portrait { display: block; width: 100%; height: auto; }
+
+  /* Interactive 3D tubes background — fixed behind the hero, fades on scroll */
+  .tubes-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1);
+    /* Soft vignette mask so the tubes feel diffused, not a hard rectangle */
+    -webkit-mask-image: radial-gradient(120% 95% at 50% 35%, #000 35%, rgba(0,0,0,0.55) 70%, transparent 100%);
+            mask-image: radial-gradient(120% 95% at 50% 35%, #000 35%, rgba(0,0,0,0.55) 70%, transparent 100%);
+  }
+  .tubes-bg--off   { display: none; }
+  .tubes-bg canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+
+  /* Bento cell */
+  .cell {
+    @apply relative rounded-2xl border border-paper/10 p-5 md:p-6 transition-colors duration-300 hover:border-paper/25;
+  }
+  .cell-accent {
+    @apply relative rounded-2xl border border-flame/40 bg-flame/[0.08] p-5 md:p-6;
+  }
+  .cell-tight { @apply p-4 md:p-5; }
+  .cell .k { @apply font-mono text-[10px] uppercase tracking-[0.25em] text-paper/45; }
+  .cell .v { @apply font-mono text-[13px] text-paper tabular-nums; }
+  .cell .big { @apply text-paper font-medium; }
+
+  /* NOW ribbon */
+  .ribbon {
+    @apply border-y border-paper/10 overflow-hidden relative;
+    background: linear-gradient(90deg, rgba(47,224,200,0.04), transparent 30%, transparent 70%, rgba(47,224,200,0.04));
+  }
+  .ribbon-track {
+    display: flex;
+    gap: 3rem;
+    white-space: nowrap;
+    animation: marquee 55s linear infinite;
+    will-change: transform;
+  }
+  .ribbon-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 999px;
+    background: #2FE0C8;
+    margin: 0 1.25rem;
+    vertical-align: 2px;
+  }
+
+  /* Incident scroll-theater — desktop overlays frames; mobile stacks them */
+  @media (min-width: 768px) {
+    .incident .incident-frame {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+    }
+    .incident .incident-frame[data-active] {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+  }
+  @media (max-width: 767px) {
+    .incident .incident-frame {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(245, 241, 234, 0.1);
+    }
+    .incident .incident-frame:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+  }
+
+  .incident-rail li {
+    position: relative;
+  }
+  .incident-rail li.is-active {
+    background: rgba(255, 77, 28, 0.08);
+  }
+  .incident-rail li.is-active .rail-dot { background: #FF4D1C; box-shadow: 0 0 0 3px rgba(255, 77, 28, 0.18); }
+  .incident-rail li.is-active .rail-time { color: rgba(245, 241, 234, 0.9); }
+  .incident-rail li.is-active .rail-label { color: rgba(245, 241, 234, 1); }
+
+  .incident-progress-bar { transform-origin: 0 0; will-change: transform; }
+
+  /* Diff line styling inside incident artifacts */
+  .diff-del.line-through-muted { text-decoration: line-through; text-decoration-color: rgba(245,241,234,0.35); }
+
+  .rule-dotted {
+    background-image: radial-gradient(circle, rgba(14, 14, 14, 0.25) 1px, transparent 1px);
+    background-size: 8px 1px;
+    background-repeat: repeat-x;
+  }
+
+  .link-arrow {
+    @apply inline-flex items-center gap-2 text-paper hover:text-flame transition-colors;
+  }
+
+  .link-arrow::after {
+    content: "→";
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .link-arrow:hover::after {
+    transform: translateX(4px);
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider bg-paper/5 text-paper/70 border border-paper/10;
+  }
+
+  .chip-dot::before {
+    content: "";
+    @apply w-1.5 h-1.5 rounded-full bg-flame;
+    animation: blink 1.8s steps(2) infinite;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-3 bg-flame text-ink rounded-full text-sm font-medium tracking-wide hover:bg-flame-light transition-colors duration-300;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-5 py-3 border border-paper/25 text-paper rounded-full text-sm font-medium tracking-wide hover:border-flame hover:text-flame transition-colors duration-300;
+  }
+
+  .section-label {
+    @apply font-mono text-[11px] uppercase tracking-[0.25em] text-paper/50;
+  }
+
+  .card-bento {
+    @apply relative overflow-hidden rounded-3xl bg-ink-soft border border-paper/10 p-8 transition-all duration-500 hover:border-flame/40;
+  }
+
+  .split-char {
+    display: inline-block;
+    will-change: transform, opacity;
+  }
+
+  .magnetic {
+    will-change: transform;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .mask-fade-r {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+
+  .grain {
+    position: relative;
+  }
+
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.08;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+}
+
+/* View Transitions API — cross-page smoothness */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
