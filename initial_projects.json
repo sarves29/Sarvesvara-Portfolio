@@ -10,7 +10,9 @@
       "github_url": "",
       "demo_url": "",
       "featured": true,
-      "order": 1
+      "order": 1,
+      "slug": "employment-project-datasprings",
+      "created_at": "2025-11-01T00:00:00Z"
     }
   },
   {
@@ -22,7 +24,9 @@
       "long_description": "Designed pipelines for scraping large datasets with cleaning and scheduling.",
       "tech_list": "Python, Selenium, BeautifulSoup, AWS S3",
       "featured": false,
-      "order": 2
+      "order": 2,
+      "slug": "web-scraper-automation",
+      "created_at": "2025-11-01T00:00:00Z"
     }
   },
   {
@@ -34,7 +38,9 @@
       "long_description": "Integrated AWS Bedrock and vector stores to enable semantic retrieval across datasets.",
       "tech_list": "LLMs, AWS Bedrock, Vector DBs, Python",
       "featured": false,
-      "order": 3
+      "order": 3,
+      "slug": "ai-powered-integration",
+      "created_at": "2025-11-01T00:00:00Z"
     }
   }
 ]

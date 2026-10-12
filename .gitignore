@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 
 *.pdf
-migrations/
 
 # C extensions
 *.so

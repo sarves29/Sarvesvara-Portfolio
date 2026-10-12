@@ -105,7 +105,6 @@ class ResumeAdmin(admin.ModelAdmin):
             )
 
             # 3️⃣ Debug
-            print("🧠 Gemini raw output:\n", response.text)
 
             raw_output = response.text.strip().replace("```json", "").replace("```", "")
             try:
@@ -148,4 +147,4 @@ class ResumeAdmin(admin.ModelAdmin):
             )
 
         except Exception as e:
-            messages.error(request, f"❌ Error processing resume: {e}")
+            messages.error(request, f"❌ Error processing resume: {type(e).__name__}")

@@ -3,10 +3,17 @@ from django.http import FileResponse, Http404
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.contrib import messages
+import html
+import logging
 import os
 import threading
+from django.conf import settings
+from django.core.cache import cache
 from django.shortcuts import redirect
+from .forms import ContactForm
 from .models import Project, Resume
+
+logger = logging.getLogger(__name__)
 
 def index(request):
     projects = Project.objects.order_by('order')
@@ -20,21 +27,42 @@ def send_email_async(message):
     try:
         sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
         response = sg.send(message)
-        print(f"✅ Email sent: {response.status_code}")
-    except Exception as e:
-        print(f"❌ Error sending email: {e}")
+        logger.info("Contact email sent: %s", response.status_code)
+    except Exception:
+        logger.exception("Error sending contact email")
+
+
+def client_ip(request):
+    forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    # The proxy appends the real client address last; earlier entries are client-supplied.
+    return forwarded.split(",")[-1].strip() or request.META.get("REMOTE_ADDR", "")
+
+
+def rate_limited(request):
+    key = f"contact-rate:{client_ip(request)}"
+    count = cache.get(key, 0)
+    if count >= settings.CONTACT_RATE_LIMIT:
+        return True
+    cache.set(key, count + 1, timeout=3600)
+    return False
 
 def contact(request):
     if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        email = request.POST.get("email", "").strip()
-        message = request.POST.get("message", "").strip()
-
-        if not name or not email or not message:
-            messages.error(request, "⚠️ Please fill out all fields.")
+        if rate_limited(request):
+            messages.error(request, "⚠️ Too many messages — please try again later.")
             return redirect("site_portfolio:contact")
 
-        subject = f"Portfolio Contact: {name}"
+        form = ContactForm(request.POST)
+        if not form.is_valid():
+            messages.error(request, "⚠️ Please fill out all fields with a valid email.")
+            return redirect("site_portfolio:contact")
+
+        # Escape everything the visitor typed before it goes into an HTML email.
+        name = html.escape(form.cleaned_data["name"])
+        email = html.escape(form.cleaned_data["email"])
+        message = html.escape(form.cleaned_data["message"]).replace("\n", "<br>")
+
+        subject = f"Portfolio Contact: {form.cleaned_data['name'][:80]}"
         html_content = f"""
             <h2>New Message from Portfolio</h2>
             <p><strong>Name:</strong> {name}</p>
@@ -42,18 +70,14 @@ def contact(request):
             <p><strong>Message:</strong><br>{message}</p>
         """
 
-        try:
-            mail = Mail(
-                from_email="sarvesvararamar.work@gmail.com",
-                to_emails="sarvesvarasar@gmail.com",
-                subject=subject,
-                html_content=html_content,
-            )
-
-            threading.Thread(target=send_email_async, args=(mail,)).start()
-            messages.success(request, "✅ Your message has been sent successfully!")
-        except Exception as e:
-            messages.error(request, f"❌ Error preparing contact email: {e}")
+        mail = Mail(
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to_emails=settings.CONTACT_TO_EMAIL,
+            subject=subject,
+            html_content=html_content,
+        )
+        threading.Thread(target=send_email_async, args=(mail,), daemon=True).start()
+        messages.success(request, "✅ Your message has been sent successfully!")
 
         return redirect("site_portfolio:contact")
 
